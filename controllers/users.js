@@ -1,3 +1,4 @@
+const bcrypt = require('bcryptjs');
 const User = require('../models/user.js');
 const { handleError } = require('../helpers/handle-error.js');
 
@@ -9,17 +10,21 @@ module.exports.createUser = (req, res) => {
     about,
     avatar,
   } = req.body;
-  User.create({
-    name,
-    email,
-    password,
-    about,
-    avatar,
-  })
-    .then((user) => res.send(user))
-    .catch((err) => {
-      const { status, message } = handleError(err);
-      res.status(status).send({ message });
+
+  bcrypt.hash(password, 10)
+    .then((hash) => {
+      User.create({
+        name,
+        email,
+        password: hash,
+        about,
+        avatar,
+      })
+        .then((user) => res.send(user))
+        .catch((err) => {
+          const { status, message } = handleError(err);
+          res.status(status).send({ message });
+        });
     });
 };
 
