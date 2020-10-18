@@ -1,9 +1,11 @@
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const User = require('../models/user.js');
-const { handleError } = require('../helpers/handle-error.js');
+const NotFoundError = require('../errors/not-found-err.js');
+const ForbiddenError = require('../errors/forbidden-err');
+const UnauthorizedError = require('../errors/unauthorized-err');
 
-module.exports.createUser = (req, res) => {
+module.exports.createUser = (req, res, next) => {
   const {
     name,
     email,
@@ -23,57 +25,46 @@ module.exports.createUser = (req, res) => {
       })
         .then((user) => res.send(user))
         .catch((err) => {
-          const { status, message } = handleError(err);
-          res.status(status).send({ message });
+          if (err.name === 'MongoError' && err.code === 11000) {
+            next(new ForbiddenError('Пользователь с данным email уже есть'));
+          } else next(err);
         });
     });
 };
 
-module.exports.getUsers = (req, res) => {
+module.exports.getUsers = (req, res, next) => {
   User.find({})
     .then((users) => res.send(users))
-    .catch((err) => {
-      const { status, message } = handleError(err);
-      res.status(status).send({ message });
-    });
+    .catch(next);
 };
 
-module.exports.getUserById = (req, res) => {
+module.exports.getUserById = (req, res, next) => {
   const { userId } = req.params;
   User.findById(userId)
-    .orFail(new Error('NotFoundUserId'))
+    .orFail(new NotFoundError())
     .then((user) => res.send(user))
-    .catch((err) => {
-      const { status, message } = handleError(err);
-      res.status(status).send({ message });
-    });
+    .catch(next);
 };
 
-module.exports.updateUser = (req, res) => {
+module.exports.updateUser = (req, res, next) => {
   const { _id: userId } = req.user;
   const { name, about } = req.body;
   User.findByIdAndUpdate(userId, { name, about }, { new: true, runValidators: true })
-    .orFail(new Error('NotFoundUserId'))
+    .orFail(new NotFoundError())
     .then((user) => res.send(user))
-    .catch((err) => {
-      const { status, message } = handleError(err);
-      res.status(status).send({ message });
-    });
+    .catch(next);
 };
 
-module.exports.updateUserAvatar = (req, res) => {
+module.exports.updateUserAvatar = (req, res, next) => {
   const { _id: userId } = req.user;
   const { avatar } = req.body;
   User.findByIdAndUpdate(userId, { avatar }, { new: true, runValidators: true })
-    .orFail(new Error('NotFoundUserId'))
+    .orFail(new NotFoundError())
     .then((user) => res.send(user))
-    .catch((err) => {
-      const { status, message } = handleError(err);
-      res.status(status).send({ message });
-    });
+    .catch(next);
 };
 
-module.exports.login = (req, res) => {
+module.exports.login = (req, res, next) => {
   const { email, password } = req.body;
   User.findUserByCredentials(email, password)
     .then((user) => {
@@ -84,7 +75,5 @@ module.exports.login = (req, res) => {
       );
       res.send({ token });
     })
-    .catch((err) => {
-      res.status(401).send({ message: err.message });
-    });
+    .catch(() => next(new UnauthorizedError('Неверный email или пароль')));
 };
