@@ -23,9 +23,13 @@ module.exports.getCards = (req, res) => {
 
 module.exports.deleteCard = (req, res) => {
   const { cardId } = req.params;
-  Card.findByIdAndRemove(cardId)
+  Card.findById(cardId)
     .orFail(new Error('NotFoundCardId'))
-    .then((card) => res.send(card))
+    .then((card) => {
+      if (card.owner.toString() !== req.user._id) throw new Error('ForbiddenDeleteThisCard');
+      card.remove()
+        .then((removedCard) => res.send(removedCard));
+    })
     .catch((err) => {
       const { status, message } = handleError(err);
       res.status(status).send({ message });

@@ -1,4 +1,5 @@
 const bcrypt = require('bcryptjs');
+const jwt = require('jsonwebtoken');
 const User = require('../models/user.js');
 const { handleError } = require('../helpers/handle-error.js');
 
@@ -69,5 +70,21 @@ module.exports.updateUserAvatar = (req, res) => {
     .catch((err) => {
       const { status, message } = handleError(err);
       res.status(status).send({ message });
+    });
+};
+
+module.exports.login = (req, res) => {
+  const { email, password } = req.body;
+  User.findUserByCredentials(email, password)
+    .then((user) => {
+      const token = jwt.sign(
+        { _id: user._id },
+        'some-secret-key',
+        { expiresIn: '7d' },
+      );
+      res.send({ token });
+    })
+    .catch((err) => {
+      res.status(401).send({ message: err.message });
     });
 };
