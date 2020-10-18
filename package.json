@@ -1,5 +1,5 @@
 {
-  "name": "express-mesto",
+  "name": "react-mesto-api-full",
   "version": "0.0.1",
   "description": "REST API for Mesto ",
   "main": "app.js",
@@ -9,7 +9,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/mukhindev-praktikum/express-mesto.git"
+    "url": "git+https://github.com/mukhindev-praktikum/react-mesto-api-full.git"
   },
   "keywords": [
     "server",
@@ -20,9 +20,9 @@
   "author": "Sergey Mukhin",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/mukhindev-praktikum/express-mesto/issues"
+    "url": "https://github.com/mukhindev-praktikum/react-mesto-api-full/issues"
   },
-  "homepage": "https://github.com/mukhindev-praktikum/express-mesto#readme",
+  "homepage": "https://github.com/mukhindev-praktikum/react-mesto-api-full#readme",
   "devDependencies": {
     "eslint": "^7.8.1",
     "eslint-config-airbnb-base": "^14.2.0",
