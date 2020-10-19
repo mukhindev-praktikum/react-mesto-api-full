@@ -6,7 +6,10 @@ const userRoutes = require('./routes/users.js');
 const cardRoutes = require('./routes/cards.js');
 const { createUser, login } = require('./controllers/users.js');
 const auth = require('./middlewares/auth.js');
+const { requestLogger, errorLogger } = require('./middlewares/logger');
 const BadRequestError = require('./errors/bad-request-err');
+
+// TODO Логи
 
 const { PORT = 3000 } = process.env;
 const app = express();
@@ -26,6 +29,8 @@ mongoose.connect('mongodb://localhost:27017/mestodb', {
 app.use(limiter);
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
+
+app.use(requestLogger);
 
 app.post('/signup', celebrate({
   body: Joi.object().keys({
@@ -51,6 +56,8 @@ app.all('*', (req, res) => {
   res.status(404);
   res.send({ message: 'Запрашиваемый ресурс не найден' });
 });
+
+app.use(errorLogger);
 
 app.use((err, req, res, next) => {
   let error = err;
