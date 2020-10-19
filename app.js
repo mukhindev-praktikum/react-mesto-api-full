@@ -1,13 +1,14 @@
 const express = require('express');
 const rateLimit = require('express-rate-limit');
 const mongoose = require('mongoose');
+const { celebrate, Joi, CelebrateError } = require('celebrate');
 const userRoutes = require('./routes/users.js');
 const cardRoutes = require('./routes/cards.js');
 const { createUser, login } = require('./controllers/users.js');
-const auth = require('./middlewares/auth');
+const auth = require('./middlewares/auth.js');
+const BadRequestError = require('./errors/bad-request-err');
 
 const { PORT = 3000 } = process.env;
-
 const app = express();
 
 const limiter = rateLimit({
@@ -26,18 +27,35 @@ app.use(limiter);
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
-app.post('/signup', createUser);
-app.post('/signin', login);
+app.post('/signup', celebrate({
+  body: Joi.object().keys({
+    email: Joi.string().required().email(),
+    password: Joi.string().required().min(8),
+    name: Joi.string().required().min(2).max(40),
+    about: Joi.string().required().min(2).max(200),
+    avatar: Joi.string().required().uri(),
+  }),
+}), createUser);
+
+app.post('/signin', celebrate({
+  body: Joi.object().keys({
+    email: Joi.string().required().email(),
+    password: Joi.string().required().min(8),
+  }),
+}), login);
 
 app.use('/users', auth, userRoutes);
 app.use('/cards', auth, cardRoutes);
+
 app.all('*', (req, res) => {
   res.status(404);
   res.send({ message: 'Запрашиваемый ресурс не найден' });
 });
 
 app.use((err, req, res, next) => {
-  const { statusCode = 500, message } = err;
+  let error = err;
+  if (error instanceof CelebrateError) error = new BadRequestError();
+  const { statusCode = 500, message } = error;
   res
     .status(statusCode)
     .send({
