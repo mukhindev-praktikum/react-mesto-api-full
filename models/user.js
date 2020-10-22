@@ -6,6 +6,7 @@ const userSchema = new mongoose.Schema({
   name: {
     type: String,
     required: true,
+    default: 'Имя Фамилия',
     minlength: 2,
     maxlength: 30,
   },
@@ -28,12 +29,14 @@ const userSchema = new mongoose.Schema({
   about: {
     type: String,
     required: true,
+    default: 'О себе',
     minlength: 2,
     maxlength: 30,
   },
   avatar: {
     type: String,
     required: true,
+    default: 'https://mukhin.dev/images/stickers/js.svg',
     validate: {
       validator(value) {
         return isURL(value);

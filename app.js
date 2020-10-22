@@ -31,22 +31,15 @@ app.use(express.urlencoded({ extended: false }));
 
 app.use(requestLogger);
 
-app.post('/signup', celebrate({
+const userJoiSchema = {
   body: Joi.object().keys({
     email: Joi.string().required().email(),
     password: Joi.string().required().min(8),
-    name: Joi.string().required().min(2).max(40),
-    about: Joi.string().required().min(2).max(200),
-    avatar: Joi.string().required().uri(),
   }),
-}), createUser);
+};
 
-app.post('/signin', celebrate({
-  body: Joi.object().keys({
-    email: Joi.string().required().email(),
-    password: Joi.string().required().min(8),
-  }),
-}), login);
+app.post('/signup', celebrate(userJoiSchema), createUser);
+app.post('/signin', celebrate(userJoiSchema), login);
 
 app.use('/users', auth, userRoutes);
 app.use('/cards', auth, cardRoutes);
