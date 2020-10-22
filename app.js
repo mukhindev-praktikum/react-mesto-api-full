@@ -1,3 +1,4 @@
+require('dotenv').config();
 const express = require('express');
 const rateLimit = require('express-rate-limit');
 const mongoose = require('mongoose');
@@ -8,8 +9,6 @@ const { createUser, login } = require('./controllers/users.js');
 const auth = require('./middlewares/auth.js');
 const { requestLogger, errorLogger } = require('./middlewares/logger');
 const BadRequestError = require('./errors/bad-request-err');
-
-// TODO Логи
 
 const { PORT = 3000 } = process.env;
 const app = express();
