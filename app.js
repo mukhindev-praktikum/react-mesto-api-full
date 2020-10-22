@@ -1,5 +1,6 @@
 require('dotenv').config();
 const express = require('express');
+const cors = require('cors');
 const rateLimit = require('express-rate-limit');
 const mongoose = require('mongoose');
 const { celebrate, Joi, CelebrateError } = require('celebrate');
@@ -27,6 +28,7 @@ mongoose.connect('mongodb://localhost:27017/mestodb', {
 
 app.use(limiter);
 app.use(express.json());
+app.use(cors());
 app.use(express.urlencoded({ extended: false }));
 
 app.use(requestLogger);
