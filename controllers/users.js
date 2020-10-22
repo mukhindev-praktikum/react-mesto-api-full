@@ -25,7 +25,7 @@ module.exports.createUser = (req, res, next) => {
         about,
         avatar,
       })
-        .then((user) => res.send(user))
+        .then((user) => res.send({ data: user }))
         .catch((err) => {
           if (err.name === 'MongoError' && err.code === 11000) {
             next(new ForbiddenError('Пользователь с данным email уже есть'));
@@ -36,7 +36,7 @@ module.exports.createUser = (req, res, next) => {
 
 module.exports.getUsers = (req, res, next) => {
   User.find({})
-    .then((users) => res.send(users))
+    .then((users) => res.send({ data: users }))
     .catch(next);
 };
 
@@ -44,7 +44,15 @@ module.exports.getUserById = (req, res, next) => {
   const { userId } = req.params;
   User.findById(userId)
     .orFail(new NotFoundError())
-    .then((user) => res.send(user))
+    .then((user) => res.send({ data: user }))
+    .catch(next);
+};
+
+module.exports.getUserByToken = (req, res, next) => {
+  const { _id: userId } = req.user;
+  User.findById(userId)
+    .orFail(new NotFoundError())
+    .then((user) => res.send({ data: user }))
     .catch(next);
 };
 
@@ -53,7 +61,7 @@ module.exports.updateUser = (req, res, next) => {
   const { name, about } = req.body;
   User.findByIdAndUpdate(userId, { name, about }, { new: true, runValidators: true })
     .orFail(new NotFoundError())
-    .then((user) => res.send(user))
+    .then((user) => res.send({ data: user }))
     .catch(next);
 };
 
@@ -62,7 +70,7 @@ module.exports.updateUserAvatar = (req, res, next) => {
   const { avatar } = req.body;
   User.findByIdAndUpdate(userId, { avatar }, { new: true, runValidators: true })
     .orFail(new NotFoundError())
-    .then((user) => res.send(user))
+    .then((user) => res.send({ data: user }))
     .catch(next);
 };
 

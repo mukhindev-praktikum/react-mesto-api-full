@@ -4,6 +4,7 @@ const { celebrate, Joi } = require('celebrate');
 const {
   getUsers,
   getUserById,
+  getUserByToken,
   updateUser,
   updateUserAvatar,
 } = require('../controllers/users.js');
@@ -22,6 +23,8 @@ router.patch('/me/avatar', celebrate({
     avatar: Joi.string().required().uri(),
   }),
 }), updateUserAvatar);
+
+router.get('/me', getUserByToken);
 
 router.get('/:userId', celebrate({
   params: Joi.object().keys({

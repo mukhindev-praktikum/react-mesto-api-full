@@ -7,13 +7,13 @@ module.exports.createCard = (req, res, next) => {
   const { _id: userId } = req.user;
   const { name, link } = req.body;
   Card.create({ name, link, owner: userId })
-    .then((card) => res.send(card))
+    .then((card) => res.send({ data: card }))
     .catch(() => next(new BadRequestError()));
 };
 
 module.exports.getCards = (req, res, next) => {
   Card.find({})
-    .then((cards) => res.send(cards))
+    .then((cards) => res.send({ data: cards }))
     .catch(next);
 };
 
@@ -26,7 +26,7 @@ module.exports.deleteCard = (req, res, next) => {
         throw new ForbiddenError('Нельзя удалять чужие карточки');
       }
       card.remove()
-        .then((removedCard) => res.send(removedCard));
+        .then((removedCard) => res.send({ data: removedCard }));
     })
     .catch(next);
 };
@@ -40,7 +40,7 @@ module.exports.likeCard = (req, res, next) => {
     { new: true, runValidators: true },
   )
     .orFail(new NotFoundError('Карточка не найдена'))
-    .then((card) => res.send(card))
+    .then((card) => res.send({ data: card }))
     .catch(next);
 };
 
@@ -53,6 +53,6 @@ module.exports.dislikeCard = (req, res, next) => {
     { new: true, runValidators: true },
   )
     .orFail(new NotFoundError('Карточка не найдена'))
-    .then((card) => res.send(card))
+    .then((card) => res.send({ data: card }))
     .catch(next);
 };
