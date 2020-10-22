@@ -5,7 +5,7 @@ const NotFoundError = require('../errors/not-found-err.js');
 const ForbiddenError = require('../errors/forbidden-err.js');
 const UnauthorizedError = require('../errors/unauthorized-err.js');
 
-const { TOKEN_SECRET_KEY } = process.env;
+const { TOKEN_SECRET_KEY = 'token-secret-key' } = process.env;
 
 module.exports.createUser = (req, res, next) => {
   const {
