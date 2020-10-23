@@ -10,6 +10,7 @@ const { createUser, login } = require('./controllers/users.js');
 const auth = require('./middlewares/auth.js');
 const { requestLogger, errorLogger } = require('./middlewares/logger');
 const BadRequestError = require('./errors/bad-request-err');
+const NotFoundError = require('./errors/not-found-err.js');
 
 const { PORT = 3000 } = process.env;
 const app = express();
@@ -52,9 +53,8 @@ app.post('/signin', celebrate(userJoiSchema), login);
 app.use('/users', auth, userRoutes);
 app.use('/cards', auth, cardRoutes);
 
-app.all('*', (req, res) => {
-  res.status(404);
-  res.send({ message: 'Запрашиваемый ресурс не найден' });
+app.all('*', (req, res, next) => {
+  next(new NotFoundError('Запрашиваемый ресурс не найден'));
 });
 
 app.use(errorLogger);
@@ -74,5 +74,6 @@ app.use((err, req, res, next) => {
 });
 
 app.listen(PORT, () => {
+  // eslint-disable-next-line no-console
   console.log(`Server listening on port ${PORT}`);
 });

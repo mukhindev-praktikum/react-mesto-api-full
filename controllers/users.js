@@ -2,8 +2,8 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const User = require('../models/user.js');
 const NotFoundError = require('../errors/not-found-err.js');
-const ForbiddenError = require('../errors/forbidden-err.js');
 const UnauthorizedError = require('../errors/unauthorized-err.js');
+const ConflictError = require('../errors/conflict-err.js');
 
 const { TOKEN_SECRET_KEY = 'token-secret-key' } = process.env;
 
@@ -25,10 +25,14 @@ module.exports.createUser = (req, res, next) => {
         about,
         avatar,
       })
-        .then((user) => res.send({ data: user }))
+        .then((user) => {
+          const userWithoutPassword = user;
+          userWithoutPassword.password = '';
+          res.send({ data: userWithoutPassword });
+        })
         .catch((err) => {
           if (err.name === 'MongoError' && err.code === 11000) {
-            next(new ForbiddenError('Пользователь с данным email уже есть'));
+            next(new ConflictError('Пользователь с данным email уже есть'));
           } else next(err);
         });
     });
