@@ -6,7 +6,7 @@
 
 Веб-приложение "Mesto": https://mesto.mukhin.dev/  
 REST API: https://api.mukhin.dev/ | 84.201.178.149  
-Репозиторий фронтенда: https://github.com/mukhindev-praktikum/mesto-react  
+Репозиторий фронтенда: https://github.com/mukhindev/mesto-react  
 
 ## Требования к окружению
 
